@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "458041467333",
+    "firebase_url": "https://roomrent-72633-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "roomrent-72633",
+    "storage_bucket": "roomrent-72633.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458041467333:android:2ccdd39f843b99453c6bac",
+        "android_client_info": {
+          "package_name": "com.example.home_for_rent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "458041467333-jv3dlo58oturn8434jhqlud1an3nproe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwS5xDHY--p0aSjGFImnLP0TqtuRUHQ-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "458041467333-jv3dlo58oturn8434jhqlud1an3nproe.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "458041467333-iasleoc195d3bol6vu08nqnavb2scdgt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.homeForRent"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458041467333:android:381fba98959abac43c6bac",
+        "android_client_info": {
+          "package_name": "com.pk.home_for_rent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "458041467333-jv3dlo58oturn8434jhqlud1an3nproe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwS5xDHY--p0aSjGFImnLP0TqtuRUHQ-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "458041467333-jv3dlo58oturn8434jhqlud1an3nproe.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "458041467333-iasleoc195d3bol6vu08nqnavb2scdgt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.homeForRent"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
