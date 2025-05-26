@@ -1,24 +1,74 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class ImagePickerController extends GetxController {
-  var pickedImage = Rx<XFile?>(null); // Store as XFile
+  var pickedImage = Rx<XFile?>(null);
   var imageName = ''.obs;
   var imageSize = ''.obs;
   var uploading = false.obs;
-  var timeLeft = ''.obs;
   var uploadProgress = 0.0.obs;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
 
   Future<void> pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: source);
 
     if (image != null) {
-      File? file = File(image.path);
+      File file = File(image.path);
       pickedImage.value = image;
-      imageName.value = file.path.split('/').last; // Extract the file name
+      imageName.value = file.path.split('/').last;
       imageSize.value = _getFileSize(file);
+
+      uploading.value = true;
+      String? uploadedUrl = await uploadToImgbb(file);
+
+      if (uploadedUrl != null) {
+        await saveUrlToFirebase(uploadedUrl);
+        Get.snackbar('✅ Success', 'Profile picture updated!');
+      } else {
+        Get.snackbar('❌ Error', 'Failed to upload image');
+      }
+
+      uploading.value = false;
+    }
+  }
+
+  Future<String?> uploadToImgbb(File file) async {
+    final apiKey = '23870d7cf1502d25a700ae7c7581036c';
+    final url = 'https://api.imgbb.com/1/upload?key=$apiKey';
+
+    try {
+      final base64 = base64Encode(await file.readAsBytes());
+      final response = await http.post(Uri.parse(url), body: {'image': base64});
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data']['url'];
+      } else {
+        print('Upload failed: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<void> saveUrlToFirebase(String imageUrl) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await _database.ref("userInfo").child(user.uid).update({
+        'profilePicture': imageUrl,
+      });
+    } else {
+      print('No user signed in');
     }
   }
 
@@ -38,9 +88,6 @@ class ImagePickerController extends GetxController {
     imageName.value = '';
     imageSize.value = '';
     uploading.value = false;
-    timeLeft.value = '';
     uploadProgress.value = 0.0;
   }
-
-  // Simulate image upload with progress
 }

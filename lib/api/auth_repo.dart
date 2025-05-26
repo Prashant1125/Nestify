@@ -88,7 +88,7 @@ class AuthRepo {
   static Future<void> googleSignInButton(BuildContext ctx) async {
     final user = await signInWithGoogle(ctx);
     if (user != null) {
-      await Get.offAllNamed(AppRoutes.home);
+      await checkUserAndNavigate();
     } else {
       print('❌ Google login failed');
     }

@@ -9,6 +9,7 @@ import 'package:home_for_rent/components/location_input/location_input.dart';
 import 'package:home_for_rent/components/location_input/radio_button.dart';
 import 'package:home_for_rent/components/pin_input.dart';
 import 'package:home_for_rent/components/primary_button.dart';
+import 'package:home_for_rent/components/profile_pic.dart';
 import 'package:home_for_rent/components/text_input_field.dart';
 import 'package:home_for_rent/controller/custom_dropdown_contoller.dart';
 import 'package:home_for_rent/controller/date_input_controller.dart';
@@ -99,7 +100,7 @@ class _AccountCreationState extends State<AccountCreation> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // UploadFileSmallSingle(),
+                    UploadFileSmallSingle(),
                     TextInputField(
                         validator: (value) {
                           return null;
