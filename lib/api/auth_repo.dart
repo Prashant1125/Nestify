@@ -104,10 +104,19 @@ class AuthRepo {
     final uid = auth.currentUser?.uid;
 
     if (uid == null) {
-      Get.snackbar("Error", "User not logged in",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
+      Get.snackbar(
+        "Error",
+        "User not logged in",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.teal,
+        colorText: Colors.white,
+        borderRadius: 12,
+        margin: EdgeInsets.all(16),
+        icon: Icon(Icons.check_circle_outline, color: Colors.white),
+        duration: Duration(seconds: 3),
+        animationDuration: Duration(milliseconds: 300),
+        forwardAnimationCurve: Curves.easeOutBack,
+      );
       return;
     }
 

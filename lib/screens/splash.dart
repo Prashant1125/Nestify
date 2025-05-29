@@ -18,7 +18,6 @@ class Splash extends StatelessWidget {
 
 Future<void> getIsLogin() async {
   if (AuthRepo.auth.currentUser != null) {
-    // ✅ If checkUserAndNavigate returns a String route:
     await AuthRepo.checkUserAndNavigate();
   } else {
     Get.offAllNamed(AppRoutes.login);

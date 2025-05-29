@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -23,7 +24,19 @@ class LocationController extends GetxController {
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         isLoading.value = false;
-        Get.snackbar("Error", "Location services are disabled.");
+        Get.snackbar(
+          "Error",
+          "Location services are disabled.",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.teal,
+          colorText: Colors.white,
+          borderRadius: 12,
+          margin: EdgeInsets.all(16),
+          icon: Icon(Icons.check_circle_outline, color: Colors.white),
+          duration: Duration(seconds: 3),
+          animationDuration: Duration(milliseconds: 300),
+          forwardAnimationCurve: Curves.easeOutBack,
+        );
         return;
       }
 
@@ -33,14 +46,38 @@ class LocationController extends GetxController {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           isLoading.value = false;
-          Get.snackbar("Error", "Location permissions are denied.");
+          Get.snackbar(
+            "Error",
+            "Location permissions are denied.",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.teal,
+            colorText: Colors.white,
+            borderRadius: 12,
+            margin: EdgeInsets.all(16),
+            icon: Icon(Icons.check_circle_outline, color: Colors.white),
+            duration: Duration(seconds: 3),
+            animationDuration: Duration(milliseconds: 300),
+            forwardAnimationCurve: Curves.easeOutBack,
+          );
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
         isLoading.value = false;
-        Get.snackbar("Error", "Location permissions are permanently denied.");
+        Get.snackbar(
+          "Error",
+          "Location permissions are permanently denied.",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.teal,
+          colorText: Colors.white,
+          borderRadius: 12,
+          margin: EdgeInsets.all(16),
+          icon: Icon(Icons.check_circle_outline, color: Colors.white),
+          duration: Duration(seconds: 3),
+          animationDuration: Duration(milliseconds: 300),
+          forwardAnimationCurve: Curves.easeOutBack,
+        );
         return;
       }
 
@@ -54,7 +91,19 @@ class LocationController extends GetxController {
       // ✅ Convert Lat/Lng to Address
       await getAddressFromLatLng(position);
     } catch (e) {
-      Get.snackbar("Error", "Failed to get location: $e");
+      Get.snackbar(
+        "Error",
+        "Failed to get location: $e",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.teal,
+        colorText: Colors.white,
+        borderRadius: 12,
+        margin: EdgeInsets.all(16),
+        icon: Icon(Icons.check_circle_outline, color: Colors.white),
+        duration: Duration(seconds: 3),
+        animationDuration: Duration(milliseconds: 300),
+        forwardAnimationCurve: Curves.easeOutBack,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -71,7 +120,19 @@ class LocationController extends GetxController {
           "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
       // print("Current Address: ${currentAddress.value}");
     } catch (e) {
-      Get.snackbar("Error", "Failed to get address: $e");
+      Get.snackbar(
+        "Error",
+        "Failed to get address: $e",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.teal,
+        colorText: Colors.white,
+        borderRadius: 12,
+        margin: EdgeInsets.all(16),
+        icon: Icon(Icons.check_circle_outline, color: Colors.white),
+        duration: Duration(seconds: 3),
+        animationDuration: Duration(milliseconds: 300),
+        forwardAnimationCurve: Curves.easeOutBack,
+      );
     }
   }
 }

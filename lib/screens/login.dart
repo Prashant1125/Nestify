@@ -168,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Get.snackbar(
                                   'Success',
                                   'Login Successfully',
-                                  snackPosition: SnackPosition.BOTTOM,
+                                  snackPosition: SnackPosition.TOP,
                                   backgroundColor: Colors.teal,
                                   colorText: Colors.white,
                                   borderRadius: 12,
@@ -186,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Get.snackbar(
                                     'Value',
                                     value.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
+                                    snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.teal,
                                     colorText: Colors.white,
                                     borderRadius: 12,
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Get.snackbar(
                                     'Error',
                                     error.message.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
+                                    snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.teal,
                                     colorText: Colors.white,
                                     borderRadius: 12,
@@ -222,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
                                   Get.snackbar(
                                     'Error',
                                     error.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
+                                    snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.teal,
                                     colorText: Colors.white,
                                     borderRadius: 12,
@@ -240,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                               Get.snackbar(
                                 'Error',
                                 'Please fill all the field',
-                                snackPosition: SnackPosition.BOTTOM,
+                                snackPosition: SnackPosition.TOP,
                                 backgroundColor: Colors.teal,
                                 colorText: Colors.white,
                                 borderRadius: 12,

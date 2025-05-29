@@ -50,6 +50,7 @@ dependencies:
   dotted_border: ^2.1.0
   gradient_borders: ^1.0.1
   http: ^1.4.0
+  cached_network_image: ^3.4.1
 
 
 dev_dependencies:

@@ -11,13 +11,18 @@ class Homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: PrimaryButton(
-          onPressed: () {
-            AuthRepo.signOut();
-            Get.offAllNamed(AppRoutes.login);
-          },
-          title: 'Logout',
-          width: 150,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            PrimaryButton(
+              onPressed: () {
+                AuthRepo.signOut();
+                Get.offAllNamed(AppRoutes.login);
+              },
+              title: 'Logout',
+              width: 150,
+            ),
+          ],
         ),
       ),
     );

@@ -34,8 +34,8 @@ class UploadFileSmallSingle extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () =>
-                      imagePickerController.pickImage(ImageSource.camera),
+                  onPressed: () => imagePickerController.pickImage(
+                      ImageSource.camera, context),
                   icon: const Icon(Icons.photo_camera),
                   label: const Text("Open Camera",
                       style:
@@ -62,8 +62,8 @@ class UploadFileSmallSingle extends StatelessWidget {
                             fontSize: 18,
                             color: Colors.grey[900])),
                     InkWell(
-                      onTap: () =>
-                          imagePickerController.pickImage(ImageSource.gallery),
+                      onTap: () => imagePickerController.pickImage(
+                          ImageSource.gallery, context),
                       child: Text("Gallery",
                           style: TextStyle(
                               decoration: TextDecoration.underline,

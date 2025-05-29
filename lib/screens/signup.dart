@@ -185,7 +185,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 Get.snackbar(
                                   'Success',
                                   'Account Created successfully',
-                                  snackPosition: SnackPosition.BOTTOM,
+                                  snackPosition: SnackPosition.TOP,
                                   backgroundColor: Colors.teal,
                                   colorText: Colors.white,
                                   borderRadius: 12,
@@ -205,7 +205,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   Get.snackbar(
                                     'Error',
                                     error.message.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
+                                    snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.teal,
                                     colorText: Colors.white,
                                     borderRadius: 12,
@@ -221,7 +221,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   Get.snackbar(
                                     'Error',
                                     error.toString(),
-                                    snackPosition: SnackPosition.BOTTOM,
+                                    snackPosition: SnackPosition.TOP,
                                     backgroundColor: Colors.teal,
                                     colorText: Colors.white,
                                     borderRadius: 12,
@@ -239,7 +239,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               Get.snackbar(
                                 'Error',
                                 'Please fill all the field',
-                                snackPosition: SnackPosition.BOTTOM,
+                                snackPosition: SnackPosition.TOP,
                                 backgroundColor: Colors.teal,
                                 colorText: Colors.white,
                                 borderRadius: 12,

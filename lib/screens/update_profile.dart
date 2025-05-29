@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_for_rent/Models/user_data_model.dart';
 import 'package:home_for_rent/api/auth_repo.dart';
+import 'package:home_for_rent/components/appbar.dart';
 import 'package:home_for_rent/components/contact_input.dart';
 import 'package:home_for_rent/components/location_input/custom_dropdown.dart';
 import 'package:home_for_rent/components/location_input/date_input.dart';
@@ -16,16 +17,15 @@ import 'package:home_for_rent/controller/date_input_controller.dart';
 import 'package:home_for_rent/controller/location_input_controller.dart';
 import 'package:home_for_rent/controller/redio_button_controller.dart';
 import 'package:home_for_rent/loader/loader.dart';
-import 'package:home_for_rent/routes/routes.dart';
 
-class AccountCreation extends StatefulWidget {
-  const AccountCreation({super.key});
+class UpdateProfile extends StatefulWidget {
+  const UpdateProfile({super.key});
 
   @override
-  State<AccountCreation> createState() => _AccountCreationState();
+  State<UpdateProfile> createState() => _UpdateProfileState();
 }
 
-class _AccountCreationState extends State<AccountCreation> {
+class _UpdateProfileState extends State<UpdateProfile> {
   List<String> types = ['Student', 'Worker', 'Emplyoee', 'Govt-Job', 'Other'];
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -54,38 +54,9 @@ class _AccountCreationState extends State<AccountCreation> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        toolbarHeight: 100,
-        title: Column(
-          children: [
-            Text(
-              " Let's Begin ",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[900],
-                fontSize: 30,
-                fontFamily: '🏠 Cursive 🏠',
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Create your account to start your journey',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'Cursive',
-                height: 1.2,
-              ),
-            ),
-          ],
-        ),
+      appBar: CustomAppBar(
+        title: 'Edit Profile',
+        hieght: 100,
       ),
       body: SafeArea(
         child: Padding(
@@ -274,12 +245,10 @@ class _AccountCreationState extends State<AccountCreation> {
                                   types: dropdownController.roleSelected.value,
                                   location: locationInputController
                                       .textEditingController.text);
-                              LoadingDialog.hide(context);
 
-                              await AuthRepo.saveUserData(userDataModel);
-                              // for navigate to Home Screen
-                              Get.offAllNamed(AppRoutes.bottomNav);
-                              // For showing a snakbar to successfull login
+                              await AuthRepo.updateUserData(userDataModel);
+                              LoadingDialog.hide(context);
+                              Get.back(); // For showing a snakbar to successfull login
                               Get.snackbar(
                                 "Success",
                                 "User data saved successfully!",

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:home_for_rent/api/auth_repo.dart';
+import 'package:home_for_rent/components/appbar.dart';
 import 'package:home_for_rent/controller/nav_controller.dart';
 import 'package:home_for_rent/screens/homepage.dart';
 import 'package:home_for_rent/screens/profile.dart';
@@ -10,25 +12,28 @@ class BottomNavScreen extends StatelessWidget {
 
   final List<Widget> _screens = [
     Homepage(),
-    // Placeholder widgets for other tabs
     Center(child: Text("Favorites")),
     Center(child: Text("Cart")),
-    MyProfile(),
+    MyProfile(uid: AuthRepo.auth.currentUser!.uid),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final NavController controller = Get.put(NavController());
+    final NavController navController = Get.put(NavController());
 
     return Obx(() => Scaffold(
-          body: _screens[controller.currentIndex.value],
+          appBar: CustomAppBar(title: 'Welcome to Nestify'),
+          body: _screens[navController.currentIndex.value],
+
+          // Bottom Navigation Bar
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                    blurRadius: 20,
-                    color: Colors.black.withAlpha((0.1 * 255).round())),
+                  blurRadius: 20,
+                  color: Colors.black.withAlpha((0.1 * 255).round()),
+                ),
               ],
             ),
             child: SafeArea(
@@ -49,9 +54,9 @@ class BottomNavScreen extends StatelessWidget {
                     GButton(icon: Icons.shopping_cart, text: 'Cart'),
                     GButton(icon: Icons.person, text: 'Profile'),
                   ],
-                  selectedIndex: controller.currentIndex.value,
+                  selectedIndex: navController.currentIndex.value,
                   onTabChange: (index) {
-                    controller.changeTab(index);
+                    navController.changeTab(index);
                   },
                 ),
               ),
