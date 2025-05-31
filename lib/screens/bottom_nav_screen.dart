@@ -4,16 +4,18 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:home_for_rent/api/auth_repo.dart';
 import 'package:home_for_rent/components/appbar.dart';
 import 'package:home_for_rent/controller/nav_controller.dart';
+import 'package:home_for_rent/screens/contact_us.dart';
 import 'package:home_for_rent/screens/homepage.dart';
+import 'package:home_for_rent/screens/my_room_screen.dart';
 import 'package:home_for_rent/screens/profile.dart';
 
 class BottomNavScreen extends StatelessWidget {
   BottomNavScreen({super.key});
 
   final List<Widget> _screens = [
-    Homepage(),
-    Center(child: Text("Favorites")),
-    Center(child: Text("Cart")),
+    HomePage(),
+    MyRoomsScreen(),
+    ContactUs(),
     MyProfile(uid: AuthRepo.auth.currentUser!.uid),
   ];
 
@@ -22,7 +24,10 @@ class BottomNavScreen extends StatelessWidget {
     final NavController navController = Get.put(NavController());
 
     return Obx(() => Scaffold(
-          appBar: CustomAppBar(title: 'Welcome to Nestify'),
+          appBar: CustomAppBar(
+            title: 'Welcome to Nestify',
+            isBottom: true,
+          ),
           body: _screens[navController.currentIndex.value],
 
           // Bottom Navigation Bar
@@ -50,8 +55,8 @@ class BottomNavScreen extends StatelessWidget {
                   iconSize: 24,
                   tabs: const [
                     GButton(icon: Icons.home, text: 'Home'),
-                    GButton(icon: Icons.favorite, text: 'Favorites'),
-                    GButton(icon: Icons.shopping_cart, text: 'Cart'),
+                    GButton(icon: Icons.my_library_books, text: 'My Rooms'),
+                    GButton(icon: Icons.support_agent, text: 'Contact Us'),
                     GButton(icon: Icons.person, text: 'Profile'),
                   ],
                   selectedIndex: navController.currentIndex.value,

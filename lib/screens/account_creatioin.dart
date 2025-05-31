@@ -138,6 +138,7 @@ class _AccountCreationState extends State<AccountCreation> {
                         validator: (value) {
                           return null;
                         },
+                        title: 'Date of birth',
                         uniqueTextInputFieldId: 'Date',
                         hintText: 'Select or Enter DOB',
                         isEmpty: false.obs,

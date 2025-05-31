@@ -9,31 +9,47 @@ class DateInputController extends GetxController {
 
   /// Formats the input date string with `dd-MM-yyyy` pattern
   String formatDate(String value) {
-    String digitsOnly = value.replaceAll('-', '');
-    final cursorPosition = textEditingController.selection.baseOffset;
+    // Remove non-digit characters
+    String digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+    String formatted = '';
+    final oldCursorPosition = textEditingController.selection.baseOffset;
 
-    if (digitsOnly.length <= 2) {
-      textEditingController.text = digitsOnly;
-    } else if (digitsOnly.length <= 4) {
-      textEditingController.text =
-          '${digitsOnly.substring(0, 2)}-${digitsOnly.substring(2)}';
-    } else {
-      textEditingController.text =
-          '${digitsOnly.substring(0, 2)}-${digitsOnly.substring(2, 4)}-${digitsOnly.substring(4, 8)}';
+    // Apply formatting
+    if (digitsOnly.length >= 1) {
+      formatted += digitsOnly.substring(0, digitsOnly.length.clamp(0, 2));
+    }
+    if (digitsOnly.length >= 3) {
+      formatted += '-' + digitsOnly.substring(2, digitsOnly.length.clamp(2, 4));
+    }
+    if (digitsOnly.length >= 5) {
+      formatted += '-' + digitsOnly.substring(4, digitsOnly.length.clamp(4, 8));
     }
 
+    textEditingController.text = formatted;
+
+    // Reposition the cursor properly
+    int newCursorPosition = oldCursorPosition;
+    if (formatted.length > oldCursorPosition &&
+        formatted[oldCursorPosition - 1] == '-') {
+      newCursorPosition++;
+    }
     textEditingController.selection = TextSelection.collapsed(
-      offset: cursorPosition.clamp(0, textEditingController.text.length),
+      offset: newCursorPosition.clamp(0, formatted.length),
     );
 
-    // Validate DOB for manual input
-    try {
-      DateFormat('dd-MM-yyyy').parse(textEditingController.text);
-    } catch (e) {
-      isValidDOB.value = false; // Set as invalid if parsing fails
+    // Validate the full date only if it has 10 characters
+    if (formatted.length == 10) {
+      try {
+        DateFormat('dd-MM-yyyy').parseStrict(formatted);
+        isValidDOB.value = true;
+      } catch (e) {
+        isValidDOB.value = false;
+      }
+    } else {
+      isValidDOB.value = false;
     }
 
-    return textEditingController.text;
+    return formatted;
   }
 
   /// Opens a date picker dialog and sets the formatted date

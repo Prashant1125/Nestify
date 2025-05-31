@@ -22,7 +22,7 @@ class LocationInputField extends StatelessWidget {
         Align(
           alignment: Alignment.topLeft,
           child: Text(
-            'Address line 1',
+            'Address',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
@@ -37,6 +37,7 @@ class LocationInputField extends StatelessWidget {
         TextFormField(
           validator: validator,
           controller: controller.textEditingController,
+          cursorColor: Colors.grey[900],
           keyboardType: TextInputType.text,
           style: TextStyle(
             fontSize: 16,

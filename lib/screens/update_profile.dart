@@ -57,6 +57,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
       appBar: CustomAppBar(
         title: 'Edit Profile',
         hieght: 100,
+        isBottom: false,
       ),
       body: SafeArea(
         child: Padding(
@@ -109,6 +110,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         validator: (value) {
                           return null;
                         },
+                        title: 'Date of birth',
                         uniqueTextInputFieldId: 'Date',
                         hintText: 'Select or Enter DOB',
                         isEmpty: false.obs,

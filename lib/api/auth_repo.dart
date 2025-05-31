@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:home_for_rent/Models/room_model.dart';
 import 'package:home_for_rent/Models/user_data_model.dart';
 import 'package:home_for_rent/loader/loader.dart';
 import 'package:home_for_rent/routes/routes.dart';
@@ -91,6 +92,7 @@ class AuthRepo {
       await checkUserAndNavigate();
     } else {
       print('❌ Google login failed');
+      LoadingDialog.hide(ctx);
     }
   }
 
@@ -142,6 +144,63 @@ class AuthRepo {
   /// 🔹 Update user data
   static Future<void> updateUserData(UserDataModel user) async {
     await fdb.ref("userInfo").child(user.uid).update(user.toMap());
+  }
+
+  /// 🔹 Upload room details (only for admins)
+  static Future<void> uploadRoom(RoomModel room) async {
+    final uid = auth.currentUser?.uid;
+    if (uid == null) throw Exception("User not logged in");
+
+    final isAdmin = await isCurrentUserAdmin();
+    if (!isAdmin) {
+      throw Exception("Only admins can upload rooms");
+    }
+
+    try {
+      final DatabaseReference ref =
+          fdb.ref("rooms").child(room.uid).child(room.roomId);
+      await ref.set(room.toMap());
+      print("✅ Room uploaded successfully!");
+    } catch (e) {
+      print("❌ Failed to upload room: $e");
+      rethrow;
+    }
+  }
+
+  /// 🔹 Delete room
+  static Future<void> deleteRoom(RoomModel room) async {
+    try {
+      final DatabaseReference ref =
+          fdb.ref("rooms").child(room.uid).child(room.roomId);
+      await ref.remove();
+      print("✅ Room deleted successfully!");
+    } catch (e) {
+      print("❌ Failed to delete room: $e");
+      rethrow;
+    }
+  }
+
+  /// 🔹 Check if current user is admin
+  static Future<bool> isCurrentUserAdmin() async {
+    final uid = auth.currentUser?.uid;
+    if (uid == null) return false;
+
+    final snapshot =
+        await fdb.ref("userInfo").child(uid).child("isAdmin").get();
+    return snapshot.value == true;
+  }
+
+  /// 🔹 Make another user admin (only if current user is admin)
+  static Future<void> makeUserAdmin(String userUid) async {
+    final currentUid = auth.currentUser?.uid;
+    if (currentUid == null) throw Exception("User not logged in");
+
+    final isAdmin = await isCurrentUserAdmin();
+    if (!isAdmin) throw Exception("Only admins can assign admin role");
+
+    await fdb.ref("userInfo").child(userUid).update({
+      "isAdmin": true,
+    });
   }
 
   /// 🔹 Sign Out

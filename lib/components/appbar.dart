@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final double? hieght;
-  const CustomAppBar({super.key, required this.title, this.hieght});
+  final bool isBottom;
+  const CustomAppBar({
+    super.key,
+    required this.title,
+    this.hieght,
+    required this.isBottom,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +39,28 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       alignment: Alignment.bottomCenter,
       padding: const EdgeInsets.only(bottom: 15),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 26,
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF333333),
-          fontFamily: 'Cursive',
-          letterSpacing: 1.2,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          isBottom
+              ? SizedBox()
+              : IconButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  icon: Icon(Icons.arrow_back),
+                ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF333333),
+              fontFamily: 'Cursive',
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
       ),
     );
   }

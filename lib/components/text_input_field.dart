@@ -14,7 +14,8 @@ class TextInputField extends StatelessWidget {
       this.suffixIcon,
       this.validator,
       this.obscureText,
-      this.onChanged});
+      this.onChanged,
+      this.maxLines});
 
   final TextEditingController textEditingController;
   final String hintText;
@@ -25,6 +26,7 @@ class TextInputField extends StatelessWidget {
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
   final Widget? suffixIcon;
+  final int? maxLines;
   final bool? obscureText;
   final _textInputFieldController = Get.put(TextInputFieldController());
 
@@ -89,6 +91,7 @@ class TextInputField extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: TextFormField(
+                          maxLines: maxLines ?? 1,
                           obscureText: obscureText ?? false,
                           validator: validator,
                           cursorColor: Colors.white,

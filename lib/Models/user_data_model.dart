@@ -12,22 +12,23 @@ class UserDataModel {
   String? pinCode;
   String? types;
   String? location;
+  bool? isAdmin;
 
-  UserDataModel({
-    required this.uid,
-    this.name,
-    this.email,
-    this.phoneNumber,
-    this.profilePicture,
-    this.dob,
-    this.gender,
-    this.city,
-    this.state,
-    this.country,
-    this.pinCode,
-    this.types,
-    this.location,
-  });
+  UserDataModel(
+      {required this.uid,
+      this.name,
+      this.email,
+      this.phoneNumber,
+      this.profilePicture,
+      this.dob,
+      this.gender,
+      this.city,
+      this.state,
+      this.country,
+      this.pinCode,
+      this.types,
+      this.location,
+      this.isAdmin = false});
 
   /// Convert Data in Map(JSON)
   Map<String, dynamic> toMap() {
@@ -45,6 +46,7 @@ class UserDataModel {
       "pinCode": pinCode ?? "",
       "types": types ?? "",
       "location": location ?? "",
+      'isAdmin': isAdmin,
     };
   }
 
@@ -64,6 +66,7 @@ class UserDataModel {
       pinCode: map["pinCode"] as String?,
       types: map["types"] as String?,
       location: map["location"] as String?,
+      isAdmin: map['isAdmin'] ?? false,
     );
   }
 }

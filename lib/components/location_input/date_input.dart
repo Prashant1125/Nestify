@@ -11,11 +11,13 @@ class DateInputField extends StatefulWidget {
     this.width,
     required this.isEmpty,
     this.validator,
+    required this.title,
   });
 
   final String hintText;
   final String uniqueTextInputFieldId;
   final bool enabled;
+  final String title;
   final double? width;
   final RxBool isEmpty;
   final String? Function(String?)? validator;
@@ -49,7 +51,7 @@ class _DateInputFieldState extends State<DateInputField> {
         Align(
           alignment: Alignment.topLeft,
           child: Text(
-            'Date of Birth',
+            widget.title,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,

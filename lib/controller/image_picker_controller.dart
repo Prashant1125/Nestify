@@ -15,6 +15,8 @@ class ImagePickerController extends GetxController {
   var uploading = false.obs;
   var uploadProgress = 0.0.obs;
 
+  var uploadedImageUrl = ''.obs; // store uploaded URL here
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
 
@@ -55,10 +57,11 @@ class ImagePickerController extends GetxController {
       uploading.value = false;
 
       if (uploadedUrl != null) {
+        uploadedImageUrl.value = uploadedUrl; // save uploaded URL here
         await saveUrlToFirebase(uploadedUrl);
         Get.snackbar(
           '✅ Success',
-          'Profile picture updated!',
+          'Image uploaded successfully!',
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.teal,
           colorText: Colors.white,
@@ -78,7 +81,7 @@ class ImagePickerController extends GetxController {
           colorText: Colors.white,
           borderRadius: 12,
           margin: EdgeInsets.all(16),
-          icon: Icon(Icons.check_circle_outline, color: Colors.white),
+          icon: Icon(Icons.error_outline, color: Colors.white),
           duration: Duration(seconds: 3),
           animationDuration: Duration(milliseconds: 300),
           forwardAnimationCurve: Curves.easeOutBack,
@@ -95,7 +98,7 @@ class ImagePickerController extends GetxController {
         colorText: Colors.white,
         borderRadius: 12,
         margin: EdgeInsets.all(16),
-        icon: Icon(Icons.check_circle_outline, color: Colors.white),
+        icon: Icon(Icons.error_outline, color: Colors.white),
         duration: Duration(seconds: 3),
         animationDuration: Duration(milliseconds: 300),
         forwardAnimationCurve: Curves.easeOutBack,
@@ -153,5 +156,73 @@ class ImagePickerController extends GetxController {
     imageSize.value = '';
     uploading.value = false;
     uploadProgress.value = 0.0;
+    uploadedImageUrl.value = '';
+  }
+
+  /// New method to pick multiple images, upload all, and return URLs list
+  Future<List<String>> uploadRoomImages(BuildContext context) async {
+    final ImagePicker picker = ImagePicker();
+
+    try {
+      final List<XFile>? images = await picker.pickMultiImage();
+
+      if (images == null || images.isEmpty) {
+        Get.snackbar(
+          'Cancelled',
+          'No images selected',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        return [];
+      }
+
+      uploading.value = true;
+      LoadingDialog.show(context);
+
+      List<String> uploadedUrls = [];
+
+      for (var img in images) {
+        File file = File(img.path);
+        final uploadedUrl = await uploadToImgbb(file);
+        if (uploadedUrl != null) {
+          uploadedUrls.add(uploadedUrl);
+        }
+      }
+
+      LoadingDialog.hide(context);
+      uploading.value = false;
+
+      if (uploadedUrls.isNotEmpty) {
+        Get.snackbar(
+          'Success',
+          '${uploadedUrls.length} images uploaded!',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          'Failed to upload images',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+
+      return uploadedUrls;
+    } catch (e) {
+      LoadingDialog.hide(context);
+      uploading.value = false;
+      Get.snackbar(
+        'Exception',
+        'Error uploading images: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return [];
+    }
   }
 }

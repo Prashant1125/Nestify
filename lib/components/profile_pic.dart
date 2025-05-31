@@ -1,5 +1,3 @@
-// upload_file_small_single.dart
-
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -137,9 +135,9 @@ class UploadFileSmallSingle extends StatelessWidget {
                       decoration: TextDecoration.underline,
                       decorationColor: Colors.teal,
                       decorationThickness: 2,
+                      fontWeight: FontWeight.w600,
                       fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[900],
+                      color: Colors.teal[700],
                     ),
                   ),
                 ),
