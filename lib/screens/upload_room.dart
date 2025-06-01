@@ -14,13 +14,11 @@ import 'package:home_for_rent/controller/location_input_controller.dart';
 import 'package:home_for_rent/controller/room_image_controller.dart';
 import 'package:home_for_rent/loader/loader.dart';
 import 'package:home_for_rent/routes/routes.dart';
-import 'package:image_picker/image_picker.dart';
 
 class UploadRoomScreen extends StatelessWidget {
   final RoomModel? roomToEdit;
 
   UploadRoomScreen({super.key, this.roomToEdit}) {
-    // Initialize values if editing
     if (roomToEdit != null) {
       titleController.text = roomToEdit!.title;
       descriptionController.text = roomToEdit!.description;
@@ -31,8 +29,10 @@ class UploadRoomScreen extends StatelessWidget {
       phoneController.text = roomToEdit!.phone;
       amenitiesController.text = roomToEdit!.amenities.join(", ");
       locationInputController.textEditingController.text = roomToEdit!.location;
-      imagePickerController.uploadedImageUrl.value =
-          roomToEdit!.images.isNotEmpty ? roomToEdit!.images.first : '';
+
+      // Upload controller me List<String> assign karna hoga, na ki single string
+      imagePickerController.uploadedImageUrls.value =
+          List<String>.from(roomToEdit!.images);
     }
   }
 
@@ -61,25 +61,31 @@ class UploadRoomScreen extends StatelessWidget {
       return;
     }
 
+    // Validate required fields
     if (titleController.text.trim().isEmpty ||
         rentController.text.trim().isEmpty ||
         cityController.text.trim().isEmpty ||
-        pinController.text.trim().isEmpty) {
-      Get.snackbar("Error",
-          "Please fill all required fields (Title, Rent, City, Pin Code)",
-          backgroundColor: Colors.red, colorText: Colors.white);
+        pinController.text.trim().isEmpty ||
+        phoneController.text.trim().isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Please fill all required fields (Title, Rent, City, Pin Code, Phone)",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return;
     }
 
-    // ✅ Fix image URL usage during edit
-    final existingImage = roomToEdit?.images.first ?? "";
-    final pickedImageUrl = imagePickerController.uploadedImageUrl.value;
+    // Use uploaded images (max 4), or fall back to existing ones (when editing)
+    final List<String> uploadedImages =
+        imagePickerController.uploadedImageUrls.toList();
+    final List<String> existingImages = roomToEdit?.images ?? [];
 
-    final uploadedImages = [
-      pickedImageUrl.isNotEmpty ? pickedImageUrl : existingImage
-    ];
+    final List<String> finalImages =
+        uploadedImages.isNotEmpty ? uploadedImages : existingImages;
 
-    if (uploadedImages.first.isEmpty) {
+    // Ensure at least one image is available
+    if (finalImages.isEmpty) {
       Get.snackbar("Error", "Please upload at least one image",
           backgroundColor: Colors.red, colorText: Colors.white);
       return;
@@ -88,19 +94,27 @@ class UploadRoomScreen extends StatelessWidget {
     LoadingDialog.show(context);
 
     try {
+      // Use old room ID if editing, else generate new one
       final roomId = roomToEdit?.roomId ??
           DateTime.now().millisecondsSinceEpoch.toString();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
+
+      // Detect room type from title
+      String getRoomType(String title) {
+        final lowerTitle = title.toLowerCase();
+        if (lowerTitle.contains("1bhk")) return "1BHK";
+        if (lowerTitle.contains("2bhk")) return "2BHK";
+        if (lowerTitle.contains("3bhk")) return "3BHK";
+        return "Other";
+      }
 
       final room = RoomModel(
         roomId: roomId,
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
         rent: rentController.text.trim(),
-        roomType: titleController.text.toLowerCase().contains("1bhk")
-            ? "1BHK"
-            : titleController.text.trim(),
-        furnishingType: "Semi-Furnished",
+        roomType: getRoomType(titleController.text.trim()),
+        furnishingType: "Semi-Furnished", // Can make this dynamic later
         location: locationInputController.textEditingController.text.trim(),
         city: cityController.text.trim(),
         state: stateController.text.trim(),
@@ -113,7 +127,7 @@ class UploadRoomScreen extends StatelessWidget {
                 .split(',')
                 .map((e) => e.trim())
                 .toList(),
-        images: uploadedImages,
+        images: finalImages,
         uid: uid,
         timestamp: timestamp,
       );
@@ -129,7 +143,7 @@ class UploadRoomScreen extends StatelessWidget {
 
       Get.offAllNamed(AppRoutes.bottomNav);
     } catch (e) {
-      Get.back();
+      LoadingDialog.hide(context);
       Get.snackbar("Error", "Failed to upload room: $e",
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -240,24 +254,83 @@ class UploadRoomScreen extends StatelessWidget {
 
                     // Image Picker
                     Obx(() {
-                      final pickedImage =
-                          imagePickerController.pickedImage.value;
+                      final controller = imagePickerController;
+                      final pickedImages = controller.pickedImages;
+
                       return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (pickedImage != null)
-                            Image.file(File(pickedImage.path), height: 150),
-                          const SizedBox(height: 10),
+                          // Preview picked images
+                          if (pickedImages.isNotEmpty)
+                            SizedBox(
+                              height: 120,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: pickedImages.length,
+                                separatorBuilder: (_, __) => SizedBox(width: 8),
+                                itemBuilder: (context, index) {
+                                  final image = pickedImages[index];
+                                  return Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          File(image.path),
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          // Remove image at index
+                                          controller.pickedImages
+                                              .removeAt(index);
+                                          controller.imageNames.removeAt(index);
+                                          controller.imageSizes.removeAt(index);
+                                          if (index <
+                                              controller
+                                                  .uploadedImageUrls.length) {
+                                            controller.uploadedImageUrls
+                                                .removeAt(index);
+                                          }
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black54,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.close,
+                                              size: 20, color: Colors.white),
+                                        ),
+                                      )
+                                    ],
+                                  );
+                                },
+                              ),
+                            )
+                          else
+                            const Text("No images selected yet."),
+
+                          const SizedBox(height: 16),
+
+                          // Pick images button
                           ElevatedButton.icon(
-                            onPressed: () => imagePickerController.pickImage(
-                                ImageSource.gallery, context),
+                            onPressed: pickedImages.length >= 4
+                                ? null
+                                : () => controller.pickMultipleImages(context),
                             icon: const Icon(Icons.photo_library),
-                            label: const Text('Pick Image'),
+                            label: const Text('Pick Images (Max 4)'),
                           ),
+
                           const SizedBox(height: 10),
-                          if (imagePickerController.uploading.value)
-                            LinearProgressIndicator(
-                              value: imagePickerController.uploadProgress.value,
-                            ),
+
+                          // Uploading progress
+                          if (controller.uploading.value)
+                            const LinearProgressIndicator(),
+
+                          const SizedBox(height: 20),
                         ],
                       );
                     }),

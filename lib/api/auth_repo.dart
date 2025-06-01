@@ -203,6 +203,29 @@ class AuthRepo {
     });
   }
 
+// fetch interested users list
+  static Future<List<Map<String, dynamic>>> fetchInterestedUsers(
+      String roomId) async {
+    final db = FirebaseDatabase.instance.ref();
+
+    // Step 1: Get list of interested uids
+    final interestSnap = await db.child("rooms/$roomId/interestedUsers").get();
+    if (!interestSnap.exists) return [];
+
+    final Map uidsMap = interestSnap.value as Map;
+    final List<String> uids = uidsMap.keys.cast<String>().toList();
+
+    // Step 2: Fetch user details for each uid
+    List<Map<String, dynamic>> users = [];
+    for (final uid in uids) {
+      final userSnap = await db.child("users/$uid").get();
+      if (userSnap.exists) {
+        users.add({...userSnap.value as Map, "uid": uid});
+      }
+    }
+    return users;
+  }
+
   /// 🔹 Sign Out
   static Future<void> signOut() async {
     await googleSignIn.signOut();

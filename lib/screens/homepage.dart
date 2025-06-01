@@ -9,6 +9,8 @@ class HomePage extends StatelessWidget {
   final TextEditingController searchController = TextEditingController();
   final RxString searchText = ''.obs;
 
+  HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,24 +24,17 @@ class HomePage extends StatelessWidget {
           final title = room.title.trim().toLowerCase();
           final location = room.city.trim().toLowerCase();
 
-          // Clean the rent string before parsing (remove commas, spaces)
           String rentString = room.rent.replaceAll(',', '').trim();
           final rent = double.tryParse(rentString) ?? double.infinity;
 
-          // Debug prints to check parsing
-          // print('Checking room: ${room.title}, rent: $rentString parsed as $rent');
-
-          // If input is a number, filter by rent <= input
           if (rentQuery != null) {
             return rent <= rentQuery;
           }
 
-          // If input is text, filter by title or location
           if (query.isNotEmpty) {
             return title.contains(query) || location.contains(query);
           }
 
-          // If input empty, show all rooms
           return true;
         }).toList();
 

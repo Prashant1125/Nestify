@@ -1,3 +1,6 @@
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
@@ -5,8 +8,10 @@ import 'package:home_for_rent/Models/room_model.dart';
 import 'package:home_for_rent/api/auth_repo.dart';
 import 'package:home_for_rent/components/appbar.dart';
 import 'package:home_for_rent/controller/fetch_room_controller.dart';
+import 'package:home_for_rent/screens/intersted_user_screen.dart';
 import 'package:home_for_rent/screens/upload_room.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:widget_zoom/widget_zoom.dart';
 
 class RoomDetailScreen extends StatelessWidget {
   final RoomModel room;
@@ -26,30 +31,61 @@ class RoomDetailScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: isOwner
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 10,
               children: [
-                FloatingActionButton.extended(
-                  backgroundColor: Colors.white, // Light background
-                  foregroundColor: Colors.teal, // Icon & text color teal
-                  elevation: 6, // Slight shadow for depth
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16), // Rounded corners
-                    side: BorderSide(
-                        color: Colors.teal.shade200, width: 1), // subtle border
-                  ),
-                  icon: const Icon(Icons.delete),
-                  label: const Text(
-                    "Delete",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    FloatingActionButton.extended(
+                      backgroundColor: Colors.white, // Light background
+                      foregroundColor: Colors.teal, // Icon & text color teal
+                      elevation: 6, // Slight shadow for depth
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16), // Rounded corners
+                        side: BorderSide(
+                            color: Colors.teal.shade200,
+                            width: 1), // subtle border
+                      ),
+                      icon: const Icon(Icons.delete),
+                      label: const Text(
+                        "Delete",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () async {
+                        await Get.find<RoomController>().deleteRoom(room);
+                        Get.back(); // screen close karna agar modal hai to
+                      },
                     ),
-                  ),
-                  onPressed: () async {
-                    await Get.find<RoomController>().deleteRoom(room);
-                    Get.back(); // screen close karna agar modal hai to
-                  },
+                    FloatingActionButton.extended(
+                      backgroundColor: Colors.white, // Light background
+                      foregroundColor: Colors.teal, // Icon & text color teal
+                      elevation: 6, // Slight shadow for depth
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16), // Rounded corners
+                        side: BorderSide(
+                            color: Colors.teal.shade200,
+                            width: 1), // subtle border
+                      ),
+                      icon: const Icon(Icons.edit),
+                      label: const Text(
+                        "Edit Detail",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.to(() => UploadRoomScreen(roomToEdit: room));
+                      },
+                    ),
+                  ],
                 ),
                 FloatingActionButton.extended(
                   backgroundColor: Colors.white, // Light background
@@ -60,47 +96,85 @@ class RoomDetailScreen extends StatelessWidget {
                     side: BorderSide(
                         color: Colors.teal.shade200, width: 1), // subtle border
                   ),
-                  icon: const Icon(Icons.call),
+                  icon: const Icon(Icons.interests_outlined),
                   label: const Text(
-                    "Edit Detail",
+                    "Interested Users",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
                   ),
                   onPressed: () {
-                    Get.to(() => UploadRoomScreen(roomToEdit: room));
+                    Get.to(() => InterestedUsersScreen(
+                          roomId: room.roomId,
+                          ownerUid: room.uid,
+                        ));
                   },
                 ),
               ],
             )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 10,
               children: [
-                FloatingActionButton.extended(
-                  backgroundColor: Colors.white, // Light background
-                  foregroundColor: Colors.teal, // Icon & text color teal
-                  elevation: 6, // Slight shadow for depth
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16), // Rounded corners
-                    side: BorderSide(
-                        color: Colors.teal.shade200, width: 1), // subtle border
-                  ),
-                  icon: const Icon(Icons.call),
-                  label: const Text(
-                    "Call ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    FloatingActionButton.extended(
+                      backgroundColor: Colors.white, // Light background
+                      foregroundColor: Colors.teal, // Icon & text color teal
+                      elevation: 6, // Slight shadow for depth
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16), // Rounded corners
+                        side: BorderSide(
+                            color: Colors.teal.shade200,
+                            width: 1), // subtle border
+                      ),
+                      icon: const Icon(Icons.call),
+                      label: const Text(
+                        "Call ",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () async {
+                        if (room.phone.isNotEmpty) {
+                          await launchUrl(Uri.parse('tel:${room.phone}'));
+                        } else {
+                          Get.snackbar('Error', 'Number not avilable');
+                        }
+                      },
                     ),
-                  ),
-                  onPressed: () async {
-                    if (room.phone.isNotEmpty) {
-                      await launchUrl(Uri.parse('tel:${room.phone}'));
-                    } else {
-                      Get.snackbar('Error', 'Number not avilable');
-                    }
-                  },
+                    FloatingActionButton.extended(
+                      backgroundColor: Colors.white, // Light background
+                      foregroundColor: Colors.teal, // Icon & text color teal
+                      elevation: 6, // Slight shadow for depth
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16), // Rounded corners
+                        side: BorderSide(
+                            color: Colors.teal.shade200,
+                            width: 1), // subtle border
+                      ),
+                      icon: const Icon(Icons.message),
+                      label: const Text(
+                        "Messege",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () async {
+                        if (room.phone.isNotEmpty) {
+                          await launchUrl(Uri.parse('sms:${room.phone}'));
+                        } else {
+                          Get.snackbar('Error', 'Number not avilable');
+                        }
+                      },
+                    ),
+                  ],
                 ),
                 FloatingActionButton.extended(
                   backgroundColor: Colors.white, // Light background
@@ -113,18 +187,32 @@ class RoomDetailScreen extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.call),
                   label: const Text(
-                    "Messege",
+                    "I'm Interested",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
                   ),
                   onPressed: () async {
-                    if (room.phone.isNotEmpty) {
-                      await launchUrl(Uri.parse('sms:${room.phone}'));
-                    } else {
-                      Get.snackbar('Error', 'Number not avilable');
+                    final uid = AuthRepo.auth.currentUser?.uid;
+                    if (uid == null) {
+                      Get.snackbar("Error", "User not logged in!",
+                          backgroundColor: Colors.red, colorText: Colors.white);
+                      return;
                     }
+
+                    final roomRef = FirebaseDatabase.instance
+                        .ref("rooms")
+                        .child(room.uid) // uploader's UID
+                        .child(room.roomId)
+                        .child("interestedUsers");
+
+                    await roomRef.update({uid: true});
+
+                    Get.snackbar("Success", "Your interest has been shared!",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.TOP);
                   },
                 ),
               ],
@@ -136,19 +224,28 @@ class RoomDetailScreen extends StatelessWidget {
             const SizedBox(height: 20),
             SizedBox(
               height: 250,
-              child: PageView.builder(
+              child: CarouselSlider.builder(
                 itemCount: room.images.length,
-                itemBuilder: (context, index) {
-                  return CachedNetworkImage(
-                    imageUrl: room.images[index],
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
+                itemBuilder: (context, index, realIndex) {
+                  return WidgetZoom(
+                    heroAnimationTag: 'zoom_${room.images.indexed}_',
+                    zoomWidget: CachedNetworkImage(
+                      imageUrl: room.images[index],
+                      placeholder: (context, url) =>
+                          Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
                   );
                 },
+                options: CarouselOptions(
+                  height: 250,
+                  viewportFraction: 1, // Full width slides
+                  enableInfiniteScroll: false,
+                  enlargeCenterPage: true,
+                  autoPlay: true,
+                ),
               ),
             ),
             const SizedBox(height: 12),

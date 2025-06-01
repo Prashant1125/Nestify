@@ -54,7 +54,7 @@ class AppRoutes {
     GetPage(
       name: '/admin_pannel',
       page: () => AdminPanelScreen(),
-    )
+    ),
   ];
 
   static const String splash = '/Splash';

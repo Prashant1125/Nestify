@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:home_for_rent/loader/loader.dart';
@@ -10,99 +9,68 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class RoomImagePickerController extends GetxController {
-  var pickedImage = Rx<XFile?>(null);
-  var imageName = ''.obs;
-  var imageSize = ''.obs;
-  var uploading = false.obs;
-  var uploadProgress = 0.0.obs;
-  var uploadedImageUrl = ''.obs;
-
+  final ImagePicker _picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
 
-  Future<void> pickImage(ImageSource source, BuildContext context) async {
-    final ImagePicker picker = ImagePicker();
+  var pickedImages = <XFile>[].obs;
+  var imageNames = <String>[].obs;
+  var imageSizes = <String>[].obs;
+  var uploadedImageUrls = <String>[].obs;
+  var uploading = false.obs;
 
+  Future<void> pickMultipleImages(BuildContext context) async {
     try {
-      final XFile? image = await picker.pickImage(source: source);
+      final List<XFile> selected = await _picker.pickMultiImage();
 
-      if (image == null) {
-        Get.snackbar(
-          'Cancelled',
-          'Image picking cancelled',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.teal,
-          colorText: Colors.white,
-          borderRadius: 12,
-          margin: EdgeInsets.all(16),
-          icon: Icon(Icons.check_circle_outline, color: Colors.white),
-          duration: Duration(seconds: 3),
-          animationDuration: Duration(milliseconds: 300),
-          forwardAnimationCurve: Curves.easeOutBack,
-        );
+      if (selected.isEmpty) {
+        Get.snackbar('Cancelled', 'No image selected.',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.teal,
+            colorText: Colors.white);
         return;
       }
 
-      final File file = File(image.path);
-      pickedImage.value = image;
-      imageName.value = file.path.split('/').last;
-      imageSize.value = _getFileSize(file);
+      if (selected.length + pickedImages.length > 4) {
+        Get.snackbar('Limit Exceeded', 'You can upload max 4 images only.',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.teal,
+            colorText: Colors.white);
+        return;
+      }
+
+      pickedImages.addAll(selected);
+      for (var file in selected) {
+        final f = File(file.path);
+        imageNames.add(f.path.split('/').last);
+        imageSizes.add(_getFileSize(f));
+      }
 
       uploading.value = true;
       LoadingDialog.show(context);
 
-      final String? uploadedUrl = await uploadToImgbb(file);
-
-      LoadingDialog.hide(context);
-      uploading.value = false;
-
-      if (uploadedUrl != null) {
-        uploadedImageUrl.value = uploadedUrl;
-        await saveUrlToFirebase(uploadedUrl);
-        Get.snackbar(
-          '✅ Success',
-          'Room image uploaded successfully!',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.teal,
-          colorText: Colors.white,
-          borderRadius: 12,
-          margin: EdgeInsets.all(16),
-          icon: Icon(Icons.check_circle_outline, color: Colors.white),
-          duration: Duration(seconds: 3),
-          animationDuration: Duration(milliseconds: 300),
-          forwardAnimationCurve: Curves.easeOutBack,
-        );
-      } else {
-        Get.snackbar(
-          '❌ Error',
-          'Failed to upload room image',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.teal,
-          colorText: Colors.white,
-          borderRadius: 12,
-          margin: EdgeInsets.all(16),
-          icon: Icon(Icons.error_outline, color: Colors.white),
-          duration: Duration(seconds: 3),
-          animationDuration: Duration(milliseconds: 300),
-          forwardAnimationCurve: Curves.easeOutBack,
-        );
+      for (var image in selected) {
+        final url = await uploadToImgbb(File(image.path));
+        if (url != null) {
+          uploadedImageUrls.add(url);
+          await saveUrlToFirebase(url);
+        }
       }
-    } catch (e) {
-      LoadingDialog.hide(context);
+
       uploading.value = false;
-      Get.snackbar(
-        '❌ Exception',
-        'Something went wrong: $e',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.teal,
-        colorText: Colors.white,
-        borderRadius: 12,
-        margin: EdgeInsets.all(16),
-        icon: Icon(Icons.error_outline, color: Colors.white),
-        duration: Duration(seconds: 3),
-        animationDuration: Duration(milliseconds: 300),
-        forwardAnimationCurve: Curves.easeOutBack,
-      );
+      LoadingDialog.hide(context);
+
+      Get.snackbar('Success', 'Images uploaded successfully!',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.teal,
+          colorText: Colors.white);
+    } catch (e) {
+      uploading.value = false;
+      LoadingDialog.hide(context);
+      Get.snackbar('Error', 'Something went wrong: $e',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.teal,
+          colorText: Colors.white);
     }
   }
 
@@ -131,7 +99,6 @@ class RoomImagePickerController extends GetxController {
   Future<void> saveUrlToFirebase(String imageUrl) async {
     final user = _auth.currentUser;
     if (user != null) {
-      // Save room image url in a different node, e.g. userRoomsImages
       await _database.ref("userRoomsImages").child(user.uid).push().set({
         'imageUrl': imageUrl,
         'uploadedAt': DateTime.now().toIso8601String(),
@@ -152,11 +119,10 @@ class RoomImagePickerController extends GetxController {
     }
   }
 
-  void cancelSelectedImage() {
-    pickedImage.value = null;
-    imageName.value = '';
-    imageSize.value = '';
-    uploadedImageUrl.value = '';
-    uploadProgress.value = 0.0;
+  void cancelSelectedImages() {
+    pickedImages.clear();
+    imageNames.clear();
+    imageSizes.clear();
+    uploadedImageUrls.clear();
   }
 }

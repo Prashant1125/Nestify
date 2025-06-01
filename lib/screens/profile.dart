@@ -7,6 +7,7 @@ import 'package:home_for_rent/api/auth_repo.dart';
 import 'package:home_for_rent/components/containers/button_container.dart';
 import 'package:home_for_rent/loader/loader.dart';
 import 'package:home_for_rent/routes/routes.dart';
+import 'package:widget_zoom/widget_zoom.dart';
 
 class MyProfile extends StatefulWidget {
   final String uid;
@@ -175,16 +176,19 @@ class _MyProfileState extends State<MyProfile> {
           elevation: 5,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(500),
-            child: CachedNetworkImage(
-              width: Get.width * .25,
-              height: Get.width * .25,
-              fit: BoxFit.contain,
-              imageUrl: userData?.profilePicture ??
-                  AuthRepo.auth.currentUser?.photoURL ??
-                  "",
-              errorWidget: (context, url, error) => const CircleAvatar(
-                backgroundColor: Colors.black12,
-                child: Icon(Icons.person, size: 50),
+            child: WidgetZoom(
+              heroAnimationTag: 'Pk',
+              zoomWidget: CachedNetworkImage(
+                width: Get.width * .25,
+                height: Get.width * .25,
+                fit: BoxFit.contain,
+                imageUrl: userData?.profilePicture ??
+                    AuthRepo.auth.currentUser?.photoURL ??
+                    "",
+                errorWidget: (context, url, error) => const CircleAvatar(
+                  backgroundColor: Colors.black12,
+                  child: Icon(Icons.person, size: 50),
+                ),
               ),
             ),
           ),
