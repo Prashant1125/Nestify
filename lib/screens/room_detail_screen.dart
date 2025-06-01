@@ -1,6 +1,4 @@
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
@@ -8,6 +6,7 @@ import 'package:home_for_rent/Models/room_model.dart';
 import 'package:home_for_rent/api/auth_repo.dart';
 import 'package:home_for_rent/components/appbar.dart';
 import 'package:home_for_rent/controller/fetch_room_controller.dart';
+import 'package:home_for_rent/controller/room_interest_controller.dart';
 import 'package:home_for_rent/screens/intersted_user_screen.dart';
 import 'package:home_for_rent/screens/upload_room.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,7 +20,13 @@ class RoomDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String? currentUserId = AuthRepo.user?.uid;
+
     bool isOwner = room.uid == currentUserId;
+    final interestController = Get.put(RoomInterestController());
+    if (!isOwner && currentUserId != null) {
+      interestController.checkIfUserAlreadyApplied(
+          room.uid, room.roomId, currentUserId);
+    }
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -176,45 +181,46 @@ class RoomDetailScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                FloatingActionButton.extended(
-                  backgroundColor: Colors.white, // Light background
-                  foregroundColor: Colors.teal, // Icon & text color teal
-                  elevation: 6, // Slight shadow for depth
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16), // Rounded corners
-                    side: BorderSide(
-                        color: Colors.teal.shade200, width: 1), // subtle border
-                  ),
-                  icon: const Icon(Icons.call),
-                  label: const Text(
-                    "I'm Interested",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-                  onPressed: () async {
-                    final uid = AuthRepo.auth.currentUser?.uid;
-                    if (uid == null) {
-                      Get.snackbar("Error", "User not logged in!",
-                          backgroundColor: Colors.red, colorText: Colors.white);
-                      return;
-                    }
+                Obx(() {
+                  if (interestController.hasApplied.value) {
+                    return FloatingActionButton.extended(
+                      backgroundColor: Colors.grey.shade300,
+                      foregroundColor: Colors.teal,
+                      onPressed: () {
+                        Get.snackbar(
+                            "Notice", "You have already shown interest.",
+                            backgroundColor: Colors.orange,
+                            colorText: Colors.white);
+                      },
+                      label: const Text("Already Applied"),
+                      icon: const Icon(Icons.check),
+                    );
+                  } else {
+                    return FloatingActionButton.extended(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.teal,
+                      onPressed: () async {
+                        final uid = AuthRepo.auth.currentUser?.uid;
+                        if (uid == null) {
+                          Get.snackbar("Error", "User not logged in!",
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white);
+                          return;
+                        }
 
-                    final roomRef = FirebaseDatabase.instance
-                        .ref("rooms")
-                        .child(room.uid) // uploader's UID
-                        .child(room.roomId)
-                        .child("interestedUsers");
+                        await interestController.markUserAsInterested(
+                            room.uid, room.roomId, uid);
 
-                    await roomRef.update({uid: true});
-
-                    Get.snackbar("Success", "Your interest has been shared!",
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.TOP);
-                  },
-                ),
+                        Get.snackbar(
+                            "Success", "Your interest has been shared!",
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white);
+                      },
+                      label: const Text("I'm Interested"),
+                      icon: const Icon(Icons.interests_outlined),
+                    );
+                  }
+                }),
               ],
             ),
       body: SingleChildScrollView(
@@ -320,7 +326,8 @@ class RoomDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(
-                      height: 50), // extra padding for FAB visibility
+                    height: 150,
+                  ) // extra padding for FAB visibility
                 ],
               ),
             ),
