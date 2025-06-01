@@ -11,7 +11,7 @@ import 'package:home_for_rent/components/primary_button.dart';
 import 'package:home_for_rent/components/text_input_field.dart';
 import 'package:home_for_rent/controller/date_input_controller.dart';
 import 'package:home_for_rent/controller/location_input_controller.dart';
-import 'package:home_for_rent/controller/image_picker_controller.dart';
+import 'package:home_for_rent/controller/room_image_controller.dart';
 import 'package:home_for_rent/loader/loader.dart';
 import 'package:home_for_rent/routes/routes.dart';
 import 'package:image_picker/image_picker.dart';
@@ -50,8 +50,8 @@ class UploadRoomScreen extends StatelessWidget {
   final DateInputController dateInputController =
       Get.put(DateInputController());
 
-  final ImagePickerController imagePickerController =
-      Get.put(ImagePickerController());
+  final RoomImagePickerController imagePickerController =
+      Get.put(RoomImagePickerController());
 
   Future<void> _uploadRoom(BuildContext context) async {
     final uid = AuthRepo.auth.currentUser?.uid;
@@ -183,6 +183,7 @@ class UploadRoomScreen extends StatelessWidget {
                       textEditingController: rentController,
                       hintText: 'Monthly rent',
                       uniqueTextInputFieldId: 'Rent',
+                      keyboardType: TextInputType.number,
                       enabled: true,
                     ),
 

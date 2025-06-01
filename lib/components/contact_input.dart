@@ -129,7 +129,6 @@ class _ContactInputFieldState extends State<ContactInputField> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: TextFormField(
-                          // validator: contactNumberValidator,
                           keyboardType: TextInputType.number,
                           cursorColor: Colors.teal,
                           cursorHeight: 15,

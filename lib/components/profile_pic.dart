@@ -12,8 +12,8 @@ class UploadFileSmallSingle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
-    final ImagePickerController imagePickerController =
-        Get.put(ImagePickerController());
+    final ProfileImagePickerController imagePickerController =
+        Get.put(ProfileImagePickerController());
 
     return SizedBox(
       height: mq.height * .33,

@@ -15,13 +15,15 @@ class TextInputField extends StatelessWidget {
       this.validator,
       this.obscureText,
       this.onChanged,
-      this.maxLines});
+      this.maxLines,
+      this.keyboardType});
 
   final TextEditingController textEditingController;
   final String hintText;
   final String title;
   final String uniqueTextInputFieldId;
   final bool enabled;
+  final TextInputType? keyboardType;
   final double? width;
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
@@ -91,6 +93,7 @@ class TextInputField extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: TextFormField(
+                          keyboardType: keyboardType,
                           maxLines: maxLines ?? 1,
                           obscureText: obscureText ?? false,
                           validator: validator,

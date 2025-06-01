@@ -46,7 +46,6 @@ class UserDataModel {
       "pinCode": pinCode ?? "",
       "types": types ?? "",
       "location": location ?? "",
-      'isAdmin': isAdmin,
     };
   }
 

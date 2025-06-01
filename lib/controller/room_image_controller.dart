@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-class ProfileImagePickerController extends GetxController {
+class RoomImagePickerController extends GetxController {
   var pickedImage = Rx<XFile?>(null);
   var imageName = ''.obs;
   var imageSize = ''.obs;
@@ -61,7 +61,7 @@ class ProfileImagePickerController extends GetxController {
         await saveUrlToFirebase(uploadedUrl);
         Get.snackbar(
           '✅ Success',
-          'Profile picture uploaded successfully!',
+          'Room image uploaded successfully!',
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.teal,
           colorText: Colors.white,
@@ -75,7 +75,7 @@ class ProfileImagePickerController extends GetxController {
       } else {
         Get.snackbar(
           '❌ Error',
-          'Failed to upload profile picture',
+          'Failed to upload room image',
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.teal,
           colorText: Colors.white,
@@ -130,17 +130,14 @@ class ProfileImagePickerController extends GetxController {
 
   Future<void> saveUrlToFirebase(String imageUrl) async {
     final user = _auth.currentUser;
-    if (user == null) {
-      print('No user is signed in');
-      return;
-    }
-    try {
-      await _database.ref("userInfo").child(user.uid).update({
-        'profilePicture': imageUrl,
+    if (user != null) {
+      // Save room image url in a different node, e.g. userRoomsImages
+      await _database.ref("userRoomsImages").child(user.uid).push().set({
+        'imageUrl': imageUrl,
+        'uploadedAt': DateTime.now().toIso8601String(),
       });
-      print("Profile picture URL updated for user ${user.uid}");
-    } catch (e) {
-      print("Error updating Firebase: $e");
+    } else {
+      print('No user is signed in');
     }
   }
 

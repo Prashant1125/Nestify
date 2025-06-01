@@ -14,9 +14,11 @@ import 'package:home_for_rent/components/profile_pic.dart';
 import 'package:home_for_rent/components/text_input_field.dart';
 import 'package:home_for_rent/controller/custom_dropdown_contoller.dart';
 import 'package:home_for_rent/controller/date_input_controller.dart';
+import 'package:home_for_rent/controller/image_picker_controller.dart';
 import 'package:home_for_rent/controller/location_input_controller.dart';
 import 'package:home_for_rent/controller/redio_button_controller.dart';
 import 'package:home_for_rent/loader/loader.dart';
+import 'package:home_for_rent/routes/routes.dart';
 
 class UpdateProfile extends StatefulWidget {
   const UpdateProfile({super.key});
@@ -41,6 +43,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final DateInputController datecontroller = Get.put(DateInputController());
   final LocationInputController locationInputController =
       Get.put(LocationInputController());
+  final profileImageController = Get.put(ProfileImagePickerController());
 
   bool isPphoneError = false;
 
@@ -216,24 +219,26 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           if (emailController.text.isNotEmpty &&
                               nameController.text.isNotEmpty &&
                               phoneController.text.isNotEmpty &&
-                              datecontroller
-                                  .textEditingController.text.isNotEmpty &&
+                              (datecontroller
+                                  .textEditingController.text.isNotEmpty) &&
                               dropdownController.roleSelected.isNotEmpty &&
-                              locationInputController
-                                  .textEditingController.text.isNotEmpty &&
+                              (locationInputController
+                                  .textEditingController.text.isNotEmpty) &&
                               cityController.text.isNotEmpty &&
                               stateController.text.isNotEmpty &&
                               countryController.text.isNotEmpty &&
                               pinController.text.isNotEmpty) {
                             if (contactNumberValidator(phoneController.text)) {
-                              //for showing a indicator
-                              LoadingDialog.show(context);
+                              try {
+                                LoadingDialog.show(context);
 
-                              // for model
-
-                              UserDataModel userDataModel = UserDataModel(
+                                UserDataModel userDataModel = UserDataModel(
                                   uid: AuthRepo.user!.uid,
-                                  profilePicture: AuthRepo.user!.photoURL,
+                                  profilePicture: profileImageController
+                                          .uploadedImageUrl.value.isNotEmpty
+                                      ? profileImageController
+                                          .uploadedImageUrl.value
+                                      : AuthRepo.user?.photoURL ?? '',
                                   name: nameController.text,
                                   email: emailController.text,
                                   phoneNumber: phoneController.text,
@@ -246,55 +251,47 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                   pinCode: pinController.text,
                                   types: dropdownController.roleSelected.value,
                                   location: locationInputController
-                                      .textEditingController.text);
+                                      .textEditingController.text,
+                                );
 
-                              await AuthRepo.updateUserData(userDataModel);
-                              LoadingDialog.hide(context);
-                              Get.back(); // For showing a snakbar to successfull login
-                              Get.snackbar(
-                                "Success",
-                                "User data saved successfully!",
-                                snackPosition: SnackPosition.TOP,
-                                backgroundColor: Colors.teal,
-                                colorText: Colors.white,
-                                borderRadius: 12,
-                                margin: EdgeInsets.all(16),
-                                icon: Icon(Icons.check_circle_outline,
-                                    color: Colors.white),
-                                duration: Duration(seconds: 3),
-                                animationDuration: Duration(milliseconds: 300),
-                                forwardAnimationCurve: Curves.easeOutBack,
-                              );
+                                await AuthRepo.updateUserData(userDataModel);
+                                LoadingDialog.hide(context);
+                                Get.offAllNamed(AppRoutes.bottomNav);
+                                Get.snackbar(
+                                  "Success",
+                                  "User data saved successfully!",
+                                  snackPosition: SnackPosition.TOP,
+                                  backgroundColor: Colors.teal,
+                                  colorText: Colors.white,
+                                  icon: Icon(Icons.check_circle_outline,
+                                      color: Colors.white),
+                                );
+                              } catch (e) {
+                                LoadingDialog.hide(context);
+                                Get.snackbar(
+                                  "Error",
+                                  "Something went wrong: $e",
+                                  snackPosition: SnackPosition.TOP,
+                                  backgroundColor: Colors.teal,
+                                  colorText: Colors.white,
+                                );
+                              }
                             } else {
                               Get.snackbar(
-                                'Error',
-                                'Incorrect phone number',
+                                "Error",
+                                "Incorrect phone number",
                                 snackPosition: SnackPosition.TOP,
                                 backgroundColor: Colors.teal,
                                 colorText: Colors.white,
-                                borderRadius: 12,
-                                margin: EdgeInsets.all(16),
-                                icon: Icon(Icons.check_circle_outline,
-                                    color: Colors.white),
-                                duration: Duration(seconds: 3),
-                                animationDuration: Duration(milliseconds: 300),
-                                forwardAnimationCurve: Curves.easeOutBack,
                               );
                             }
                           } else {
                             Get.snackbar(
-                              'Error',
-                              'Please fill all the fields',
+                              "Error",
+                              "Please fill all the fields",
                               snackPosition: SnackPosition.TOP,
                               backgroundColor: Colors.teal,
                               colorText: Colors.white,
-                              borderRadius: 12,
-                              margin: EdgeInsets.all(16),
-                              icon: Icon(Icons.check_circle_outline,
-                                  color: Colors.white),
-                              duration: Duration(seconds: 3),
-                              animationDuration: Duration(milliseconds: 300),
-                              forwardAnimationCurve: Curves.easeOutBack,
                             );
                           }
                         })
