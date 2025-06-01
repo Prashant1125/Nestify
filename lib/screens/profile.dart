@@ -64,14 +64,29 @@ class _MyProfileState extends State<MyProfile> {
               icon: Icons.edit,
             ),
             const SizedBox(height: 10),
-            if (isAdmin)
-              ButtonContainer(
-                onTap: () {
+            ButtonContainer(
+              onTap: () {
+                if (isAdmin) {
                   Get.toNamed(AppRoutes.uploadRoomScren);
-                },
-                title: 'Room Upload',
-                icon: Icons.add_home_work_outlined,
-              ),
+                } else {
+                  Get.snackbar(
+                    "Warning",
+                    "Only admin can upload ! Contact us",
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Colors.teal,
+                    colorText: Colors.white,
+                    borderRadius: 12,
+                    margin: EdgeInsets.all(16),
+                    icon: Icon(Icons.check_circle_outline, color: Colors.white),
+                    duration: Duration(seconds: 3),
+                    animationDuration: Duration(milliseconds: 300),
+                    forwardAnimationCurve: Curves.easeOutBack,
+                  );
+                }
+              },
+              title: 'Room Upload',
+              icon: Icons.add_home_work_outlined,
+            ),
             const SizedBox(height: 10),
             ButtonContainer(
               onTap: () async {
