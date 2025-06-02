@@ -154,34 +154,21 @@ class _SignUpPageState extends State<SignUpPage> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              'Forgot Password?',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ),
+
                         const SizedBox(height: 20),
-                        // Sign In Button
                         PrimaryButton(
                           onPressed: () {
                             if (emailController.text.isNotEmpty &&
                                 nameController.text.isNotEmpty &&
                                 pwdController.text.isNotEmpty) {
-                              LoadingDialog.show(
-                                  context); // 🔹 Show Loading Dialog
+                              LoadingDialog.show(context);
 // for sign up
                               AuthRepo.signup(emailController.text,
                                       pwdController.text, nameController.text)
                                   .then((value) {
                                 AuthRepo.auth.currentUser
                                     ?.updateDisplayName(nameController.text);
-                                LoadingDialog.hide(
-                                    context); // 🔹 Hide Loading Dialog
+                                LoadingDialog.hide(context);
                                 Get.snackbar(
                                   'Success',
                                   'Account Created successfully',
@@ -199,8 +186,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 );
                                 Get.offAllNamed(AppRoutes.login);
                               }).onError((error, stackTrace) {
-                                LoadingDialog.hide(
-                                    context); // 🔹 Hide Loading Dialog
+                                LoadingDialog.hide(context);
                                 if (error is FirebaseAuthException) {
                                   Get.snackbar(
                                     'Error',
@@ -269,7 +255,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 width: 5,
                               ),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Get.offAllNamed(AppRoutes.login);
+                                },
                                 child: const Text(
                                   'Login',
                                   style: TextStyle(
